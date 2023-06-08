@@ -2,6 +2,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System;
 using Task6.BE;
 using Task6.BE.Hubs;
 
@@ -25,8 +26,17 @@ builder.Services.AddDbContext<MailDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Task6")));
 
 builder.Services.AddSingleton<IDictionary<string, UserConnection>>(opts => new Dictionary<string, UserConnection>());
+
 builder.Services.AddControllers();
+
 var app = builder.Build();
+
+using (var db = app.Services.CreateScope().ServiceProvider.GetService<MailDbContext>())
+{
+    db.Database.Migrate();
+}
+
+
 app.UseRouting();
 app.UseCors();
 
